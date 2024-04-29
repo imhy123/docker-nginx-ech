@@ -22,6 +22,9 @@ RUN apt-get install -y libperl-dev libpcre3-dev zlib1g-dev && \
 
 FROM nginx:${NGINX_VERSION} 
 
+RUN apt-get update && \
+    apt-get install -y libpcre3
+
 COPY --from=build /src/nginx/objs/nginx /usr/sbin
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
