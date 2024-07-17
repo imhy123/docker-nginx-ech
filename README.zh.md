@@ -1,23 +1,23 @@
-# Nginx Docker image featuring ECH support
+# 支持ECH的NGINX Docker镜像
 
-[中文](README.zh.md)
+[English](README.md)
 
-This project is implemented based on the following projects:
+本项目基于下面的项目进行实现:
 
 1. [Experimental fork of Nginx with Encrypted Client Hello support](https://github.com/yaroslavros/nginx)
 2. [docker-nginx-boringssl](https://github.com/nginx-modules/docker-nginx-boringssl/blob/main/mainline-alpine.Dockerfile)
 
-## Quick Start
+## 快速开始
 
-### Docker Container
+### Docker容器
 
-#### Generate ECH key
+#### 生成 ECH key
 
 ```
 openssl genpkey -out /path/to/your/docker/mount/directory/ech.key -algorithm X25519
 ```
 
-#### Prepare nginx.conf
+#### 准备 nginx.conf
 
 
 vim /path/to/your/docker/mount/directory/nginx.conf
@@ -115,7 +115,7 @@ http {
 
 ```
 
-#### Create Docker Container
+#### 创建Docker容器
 
 ```
 docker run --name nginx -d \
@@ -127,13 +127,13 @@ docker run --name nginx -d \
     imhy123/nginx-ech:1.25.4-beta.2
 ```
 
-Use `docker logs -f nginx` to retrieve the ECH public key, like `server a.example.com ECH config for HTTPS DNS record ech="THISISECHPUBLICKEY"`.
+执行 `docker logs -f nginx` 来获取 ECH public key, 日志形如 `server a.example.com ECH config for HTTPS DNS record ech="THISISECHPUBLICKEY"`.
 
-### DNS Record
+### DNS记录
 
-#### A/AAAA DNS Record
+#### A/AAAA 记录
 
-Like any standard website, start by adding an A(for IPv4) or AAAA(for IPv6) record with your DNS provider to point to your server; of course, a CNAME record would work as well.
+像普通的网站一样，先在你的DNS服务提供商中添加A记录(IPv4)或者AAAA记录(IPv6)指向你的服务器，当然CNAME也可以：
 
 ```
 A, a.example.com, 1.1.1.1
@@ -142,27 +142,27 @@ AAAA, a.example.com, abcd:ef01:2345:6789:abcd:ef01:2345:6789
 AAAA, b.example.com, abcd:ef01:2345:6789:abcd:ef01:2345:6789
 ```
 
-#### HTTPS DNS Record
+#### HTTPS DNS记录
 
-An HTTPS DNS record is a special type of DNS record, with a type value of 65. ECH needs to work in conjunction with your HTTPS DNS record. If the service is offered on port 443, only a single HTTPS DNS record named "a.example.com" is required. However, if the service is provided on a non-443 port, a record in the format _port._protocol.name is necessary. For example, if the service is on port 54321, an HTTPS DNS record named "_54321._https.a" should be provided.
+HTTPS DNS记录是一种特殊的DNS记录、其类型为65。ECH需要配合如果你的HTTPS DNS记录来使用，如果服务提供在443端口，则只需要提供一条名称为 "a.example.com" 的HTTPS DNS记录即可；如果服务提供在非443端口，则需要提供格式为 `_port._protocol.name` 的记录，例如在 54321 端口提供服务，则需要提供一条名称为 "_54321._https.a" 的 HTTPS DNS记录。
 
-The record's value must include fields such as alpn, port, ech, ipv4hint (if available), and ipv6hint (if available), with the ech field being the ECH public key retrieved via docker logs.
+记录的值需要提供 alpn、port、ech、ipv4hint(如有)、ipv6hint(如有) 等字段，其中的ech字段即为通过 docker logs 获取到的 ECH public key。
 
-Therefore, in this case, the HTTPS DNS record to be added with the DNS service provider is as follows:
+因此在本例中，需要向DNS服务提供商中添加的HTTPS DNS记录如下：
 
 ```
 HTTPS, _54321._https.a, alpn="h3" port="54321" ipv4hint="1.1.1.1" ipv6hint="abcd:ef01:2345:6789:abcd:ef01:2345:6789" ech="THISISECHPUBLICKEY"
 HTTPS, _54321._https.b, alpn="h3" port="54321" ipv4hint="1.1.1.1" ipv6hint="abcd:ef01:2345:6789:abcd:ef01:2345:6789" ech="THISISECHPUBLICKEY"
 ```
 
-### Testing and Usage
+### 测试与使用
 
-#### Testing DNS Record
+#### 测试DNS记录
 
-You can directly use the dig command (a newer version of dig may be required) to check if the DNS record has taken effect: `dig @8.8.8.8 a.example.com https`.
+可以直接使用dig命令（可能需要比较新的dig版本）来检查DNS记录有没有生效：`dig @8.8.8.8 a.example.com https`。
 
-#### Usage
+#### 使用
 
-To use ECH, you need to set up a DOH (DNS over HTTPS) server in Chrome/Firefox browsers. For example, in Chrome, you can set a DOH server in Settings > Privacy and security > Security, such as "https://dns.google/dns-query".
+使用ECH需要在Chrome/Firefox浏览器中设置了DOH(DNS over HTTPS)服务器，如Chrome可以在 设置-隐私与安全-安全 里面设置一个DOH服务器，如 "https://dns.google/dns-query"。
 
-Once everything is set up, you can access "https://a.example.com:54321/.well-known/origin-svcb" to check if your ECH is working correctly.
+一切都准备好后，即可以访问通过 "https://a.example.com:54321/.well-known/origin-svcb" 来检查你的ECH是否正常工作。
