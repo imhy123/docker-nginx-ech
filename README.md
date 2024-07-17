@@ -36,7 +36,7 @@ http {
         http3_hq on;
 
         server_name a.example.com;
-	    proxy_buffering off;
+        proxy_buffering off;
 
         # ech key, only need to configure once
         ssl_ech a.example.com 1 key=/etc/nginx/ech.key;
@@ -51,7 +51,7 @@ http {
         ssl_session_cache shared:MozSSL:10m;  # about 40000 sessions
         ssl_session_tickets off;
 
-	    add_header Alt-Svc 'h3=":60500";h3-29=":60500"';   # Advertise that HTTP/3 is available
+        add_header Alt-Svc 'h3=":60500";h3-29=":60500"';   # Advertise that HTTP/3 is available
 
         # HSTS
         add_header Strict-Transport-Security "max-age=31536000" always;
@@ -65,7 +65,7 @@ http {
 
         location /.well-known/origin-svcb {
             add_header Content-Type application/json;
-	        return 200 '{"enable":$ssl_ech,"endpoints":[{"ech":"$ssl_ech_config"}]}';
+            return 200 '{"enable":$ssl_ech,"endpoints":[{"ech":"$ssl_ech_config"}]}';
         }
     }
 
@@ -77,7 +77,7 @@ http {
         http3_hq on;
 
         server_name b.example.com;
-	    proxy_buffering off;
+        proxy_buffering off;
 
         ssl_certificate /etc/nginx/b.example.com.pem;
         ssl_certificate_key /etc/nginx/b.example.com.key;
@@ -89,7 +89,7 @@ http {
         ssl_session_cache shared:MozSSL:10m;  # about 40000 sessions
         ssl_session_tickets off;
 
-	    add_header Alt-Svc 'h3=":60500";h3-29=":60500"';   # Advertise that HTTP/3 is available
+        add_header Alt-Svc 'h3=":60500";h3-29=":60500"';   # Advertise that HTTP/3 is available
 
         # HSTS
         add_header Strict-Transport-Security "max-age=31536000" always;
@@ -103,7 +103,7 @@ http {
 
         location /.well-known/origin-svcb {
             add_header Content-Type application/json;
-	        return 200 '{"enable":$ssl_ech,"endpoints":[{"ech":"$ssl_ech_config"}]}';
+            return 200 '{"enable":$ssl_ech,"endpoints":[{"ech":"$ssl_ech_config"}]}';
         }
     }
 
